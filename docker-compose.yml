@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: media_pipeline_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./media_pipeline.db
+      - UPLOAD_DIR=./uploads
+      - MAX_UPLOAD_SIZE_MB=10
+      - WORKER_CONCURRENCY=2
+      - MAX_RETRIES=3
+    volumes:
+      - ./uploads:/app/uploads
+      - ./media_pipeline.db:/app/media_pipeline.db
+    restart: unless-stopped

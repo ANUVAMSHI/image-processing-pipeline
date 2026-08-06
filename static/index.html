@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Processing Pipeline - Quality Inspection Dashboard</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="brand-symbol">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <h1>Media Processing Pipeline</h1>
+                    <p class="subtitle">Vehicle Quality Inspection & Anomaly Verification System</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="badge badge-status"><span class="dot green"></span> System Online</span>
+                <a href="/docs" target="_blank" class="btn btn-sm btn-outline">API Reference</a>
+            </div>
+        </header>
+
+        <!-- Enterprise Field Sample Test Suite -->
+        <section class="card sample-banner">
+            <div class="banner-header">
+                <div>
+                    <h3>Sample Dataset Verification</h3>
+                    <p class="banner-sub">Execute pipeline analysis on the provided field vehicle dataset.</p>
+                </div>
+                <button id="run-all-samples-btn" class="btn btn-primary btn-sm">Run Full Test Suite</button>
+            </div>
+            <div class="sample-cards-grid">
+                <div class="sample-card" onclick="uploadSampleByName('user_sample_1.jpg')">
+                    <div class="sample-card-title">Sample 1: Pune Vehicle</div>
+                    <div class="sample-card-sub">Plate: MH12NW8556 • Rear Daylight</div>
+                    <span class="sample-tag">Analyze Image</span>
+                </div>
+                <div class="sample-card" onclick="uploadSampleByName('user_sample_2.jpg')">
+                    <div class="sample-card-title">Sample 2: Chennai Vehicle</div>
+                    <div class="sample-card-sub">Plate: TN05BT5754 • Overlay Stamp</div>
+                    <span class="sample-tag">Analyze Image</span>
+                </div>
+                <div class="sample-card" onclick="uploadSampleByName('user_sample_3.jpg')">
+                    <div class="sample-card-title">Sample 3: Shadowed Vehicle</div>
+                    <div class="sample-card-sub">Plate: MH12KR1145 • Underpass</div>
+                    <span class="sample-tag">Analyze Image</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Grid Layout -->
+        <main class="dashboard-grid">
+            <!-- Left Column: Upload Section -->
+            <section class="card upload-section">
+                <h2>Upload Image</h2>
+                <p class="section-desc">Select or drop a vehicle image for automated pipeline processing.</p>
+
+                <div id="drop-zone" class="drop-zone">
+                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" hidden>
+                    <div class="drop-zone-content">
+                        <div class="upload-svg">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <p class="upload-text"><strong>Click to upload</strong> or drag file here</p>
+                        <p class="upload-hint">Supported formats: JPEG, PNG, WEBP (Max 10MB)</p>
+                    </div>
+                    <div id="preview-container" class="preview-container hidden">
+                        <img id="image-preview" src="" alt="Preview">
+                        <div class="preview-overlay">
+                            <span id="preview-filename">image.jpg</span>
+                            <button id="cancel-btn" class="btn-cancel">Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="upload-actions">
+                    <button id="upload-btn" class="btn btn-primary btn-block" disabled>Process Image</button>
+                </div>
+
+                <!-- Pipeline Inspection Rules -->
+                <div class="heuristics-box">
+                    <h3>Pipeline Verification Checks</h3>
+                    <ul class="heuristics-list">
+                        <li><span>Sharpness Analysis</span> Laplacian Variance (&lt; 100.0)</li>
+                        <li><span>Luminance & Contrast</span> HSV Channel Mean (&lt; 45 / &gt; 215)</li>
+                        <li><span>Duplicate Prevention</span> Perceptual Hash (Hamming &le; 4)</li>
+                        <li><span>Number Plate OCR</span> Indian Registration Format Verification</li>
+                        <li><span>Metadata Integrity</span> EXIF Camera & Screenshot Heuristics</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Right Column: Queue & Statistics -->
+            <section class="queue-section">
+                <!-- Summary Metrics -->
+                <div class="analytics-row">
+                    <div class="stat-card">
+                        <span class="stat-num" id="stat-total">0</span>
+                        <span class="stat-label">Total Processed</span>
+                    </div>
+                    <div class="stat-card stat-pass">
+                        <span class="stat-num" id="stat-pass">0</span>
+                        <span class="stat-label">Passed</span>
+                    </div>
+                    <div class="stat-card stat-warning">
+                        <span class="stat-num" id="stat-warning">0</span>
+                        <span class="stat-label">Warning</span>
+                    </div>
+                    <div class="stat-card stat-reject">
+                        <span class="stat-num" id="stat-reject">0</span>
+                        <span class="stat-label">Rejected</span>
+                    </div>
+                </div>
+
+                <!-- Processing Queue -->
+                <div class="card list-card">
+                    <div class="card-header">
+                        <h2>Processing Queue</h2>
+                        <div class="filter-group">
+                            <select id="status-filter">
+                                <option value="">All Statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="completed">Completed</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                            <button id="refresh-btn" class="btn btn-icon" title="Refresh Queue">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                                </svg>
+                            </button>
+                            <button id="clear-queue-btn" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: var(--danger-bg);">Clear Queue</button>
+                        </div>
+                    </div>
+
+                    <div id="image-list" class="image-list">
+                        <div class="empty-state">
+                            <p>Loading queue history...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Detail Inspection Drawer / Modal -->
+    <div id="detail-modal" class="modal-backdrop hidden">
+        <div class="modal-content card">
+            <button id="modal-close" class="modal-close">&times;</button>
+            <div class="modal-body" id="modal-body-content">
+                <!-- Dynamic inspection report -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
