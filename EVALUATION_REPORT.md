@@ -46,8 +46,8 @@ flowchart TD
     Analyzer -->|9. Analysis Results| Worker
     Worker -->|10. Update DB 'completed' / 'failed'| DB
 
-    Client -->|11. Poll GET /api/v1/images/{id}/status| API
-    Client -->|12. GET /api/v1/images/{id}/results| API
+    Client -->|"11. Poll GET /api/v1/images/id/status"| API
+    Client -->|"12. GET /api/v1/images/id/results"| API
 ```
 
 ---
