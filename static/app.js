@@ -241,10 +241,14 @@ function renderImageList(images) {
         const dateStr = new Date(img.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         
         let verdictBadge = '';
+        let plateBadge = '';
         if (img.analysis) {
             const v = img.analysis.overall_verdict;
             const cls = v === 'PASS' ? 'badge-pass' : (v === 'WARNING' ? 'badge-warning' : 'badge-reject');
             verdictBadge = `<span class="badge ${cls}">${v}</span>`;
+            if (img.analysis.detected_plate) {
+                plateBadge = `<span class="badge badge-status" style="font-weight: 700; color: #4f46e5; border-color: rgba(79,70,229,0.3);">Plate: ${escapeHtml(img.analysis.detected_plate)}</span>`;
+            }
         }
 
         const statusLabel = img.status === 'completed' ? 'Completed' : (img.status === 'processing' ? 'Processing' : img.status);
@@ -260,6 +264,7 @@ function renderImageList(images) {
                     </div>
                 </div>
                 <div class="item-right" style="display: flex; gap: 8px; align-items: center;">
+                    ${plateBadge}
                     ${verdictBadge}
                     ${statusBadge}
                     <button class="btn btn-icon btn-delete" onclick="deleteSingleImage(event, '${img.id}')" title="Delete image">

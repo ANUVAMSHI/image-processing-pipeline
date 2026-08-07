@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.models.image import ImageRecord, AnalysisResultRecord, Verdict
 
-# Indian Motor Vehicle License Plate Pattern (Standard 10-char + Sub-series + Bharat BH Series)
-# Examples: MH12NW8556, TN05BT5754, MH12KR1145, KA05MB9999, DL1C1234, 22BH1234AA
+# Indian Motor Vehicle License Plate Pattern (Standard 10-char + Sub-series + Bharat BH Series + Generic 8-10 Char Plates)
+# Examples: MH12NW8556, TN05BT5754, MH12KR1145, KA05MB9999, DL1C1234, 22BH1234AA, MP09AB1234
 INDIAN_PLATE_PATTERN = re.compile(
     r"\b([A-Z]{2}\s?[0-9]{1,2}\s?[A-Z]{1,3}\s?[0-9]{4}|[0-9]{2}\s?BH\s?[0-9]{4}\s?[A-Z]{1,2})\b",
     re.IGNORECASE
@@ -113,8 +113,8 @@ class ImageAnalyzer:
     @staticmethod
     def extract_ocr_and_validate_plate(file_path: str, filename: str, img_bgr: np.ndarray) -> Tuple[Optional[str], bool]:
         """
-        Extracts license plate text using OCR / ROI color contour search
-        and validates format against Indian Vehicle Registration standards.
+        Extracts license plate text using PyTesseract OCR / Contrast Pre-processing
+        and validates format against Motor Vehicle Registration standards.
         """
         # Check known sample mapping first
         basename = os.path.basename(filename)
@@ -124,45 +124,56 @@ class ImageAnalyzer:
         detected_text = ""
         try:
             import pytesseract
-            # Run OCR on ROI cropped yellow/white license plate box
+            
+            # Pre-processing 1: Full image grayscale + adaptive thresholding for OCR
+            gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+            gray_blur = cv2.bilateralFilter(gray, 11, 17, 17)
+            thresh = cv2.adaptiveThreshold(gray_blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+            
+            ocr_full = pytesseract.image_to_string(thresh, config="--psm 11")
+            detected_text = ocr_full.strip().upper()
+
+            # Match regex on full text
+            match = INDIAN_PLATE_PATTERN.search(detected_text)
+            if match:
+                return match.group(0).replace(" ", "").upper(), True
+
+            # Pre-processing 2: Yellow/White license plate contour search
             hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
-            # Mask yellow license plates typical of Indian commercial autos
-            yellow_mask = cv2.inRange(hsv, (15, 100, 100), (35, 255, 255))
+            yellow_mask = cv2.inRange(hsv, (15, 80, 80), (35, 255, 255))
             contours, _ = cv2.findContours(yellow_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             
-            roi_crop = img_bgr
             for cnt in contours:
                 area = cv2.contourArea(cnt)
-                if area > 1000:
+                if area > 800:
                     x, y, w, h = cv2.boundingRect(cnt)
                     aspect = w / float(h)
-                    if 1.5 <= aspect <= 5.0:
-                        roi_crop = img_bgr[y:y+h, x:x+w]
-                        break
-
-            rgb_img = cv2.cvtColor(roi_crop, cv2.COLOR_BGR2RGB)
-            ocr_out = pytesseract.image_to_string(rgb_img, config="--psm 7")
-            detected_text = ocr_out.strip().upper()
+                    if 1.5 <= aspect <= 5.5:
+                        roi = gray[y:y+h, x:x+w]
+                        ocr_roi = pytesseract.image_to_string(roi, config="--psm 7")
+                        roi_match = INDIAN_PLATE_PATTERN.search(ocr_roi.strip().upper())
+                        if roi_match:
+                            return roi_match.group(0).replace(" ", "").upper(), True
         except Exception:
             pass
 
-        # Match against standard Indian Motor Vehicle regex pattern
-        match = INDIAN_PLATE_PATTERN.search(detected_text)
-        if match:
-            plate_number = match.group(0).replace(" ", "").upper()
-            return plate_number, True
-
+        # Clean fallback text search (e.g. State Code + 4 digits)
         clean_text = re.sub(r"[^A-Z0-9]", "", detected_text)
         match_clean = INDIAN_PLATE_PATTERN.search(clean_text)
         if match_clean:
             return match_clean.group(0).upper(), True
 
-        # State prefix search fallback
+        # State prefix search fallback (MH, TN, KA, DL, HR, UP, AP, TS, RJ, GJ, WB, MP, PB, KL)
         state_match = re.search(r"(MH|TN|KA|DL|HR|UP|AP|TS|RJ|GJ|WB|MP|PB|KL)\s?[0-9]{1,2}\s?[A-Z]{1,3}\s?[0-9]{4}", clean_text)
         if state_match:
             return state_match.group(0).upper(), True
 
-        return (clean_text[:12] if clean_text else None), False
+        # Generic plate format fallback if 8-11 alphanumeric chars found
+        generic_match = re.search(r"[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}", clean_text)
+        if generic_match:
+            return generic_match.group(0).upper(), True
+
+        return (clean_text[:12] if len(clean_text) >= 6 else None), (len(clean_text) >= 6)
 
     @staticmethod
     def check_dimensions_and_aspect(height: int, width: int) -> Tuple[bool, bool]:
@@ -270,7 +281,6 @@ class ImageAnalyzer:
             flagged_issues.append("Abnormal Aspect Ratio")
 
         # Determine Verdict:
-        # If valid plate + no blur + no duplicate => PASS!
         if is_duplicate or (is_blurry and blur_score < 40) or is_screenshot:
             overall_verdict = Verdict.REJECT.value
         elif len(flagged_issues) == 0:
