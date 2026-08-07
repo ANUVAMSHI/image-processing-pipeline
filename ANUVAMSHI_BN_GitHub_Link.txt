@@ -4,14 +4,23 @@ Candidate Name: ANUVAMSHI BN
 Submission Date: August 2026
 Target Role: Backend & AI Engineering
 
-GitHub Repository URL:
-https://github.com/ANUVAMSHI/image-processing-pipeline
+--------------------------------------------------------------------------------
+SUBMISSION LINKS (PUBLIC & LOCAL)
+--------------------------------------------------------------------------------
+1. GitHub Repository URL:
+   https://github.com/ANUVAMSHI/image-processing-pipeline
 
-Live Local Application URL:
-http://localhost:8000
+2. Live Public Dashboard UI (Accessible from any phone/browser worldwide):
+   https://anuvamshi-pipeline.loca.lt
 
-Interactive OpenAPI Specs:
-http://localhost:8000/docs
+3. Live Public Interactive API Documentation (OpenAPI Specs):
+   https://anuvamshi-pipeline.loca.lt/docs
+
+4. Local Application URL (Executes via `python -m uvicorn app.main:app --port 8000`):
+   http://localhost:8000
+
+5. Local Interactive API Documentation:
+   http://localhost:8000/docs
 
 --------------------------------------------------------------------------------
 EXECUTIVE SUMMARY & SYSTEM HIGHLIGHTS
