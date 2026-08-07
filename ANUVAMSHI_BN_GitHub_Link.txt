@@ -1,0 +1,39 @@
+TECHNICAL ASSIGNMENT SUBMISSION: INTELLIGENT MEDIA PROCESSING PIPELINE
+
+Candidate Name: ANUVAMSHI BN
+Submission Date: August 2026
+Target Role: Backend & AI Engineering
+
+GitHub Repository URL:
+https://github.com/ANUVAMSHI/image-processing-pipeline
+
+Live Local Application URL:
+http://localhost:8000
+
+Interactive OpenAPI Specs:
+http://localhost:8000/docs
+
+--------------------------------------------------------------------------------
+EXECUTIVE SUMMARY & SYSTEM HIGHLIGHTS
+--------------------------------------------------------------------------------
+1. Production-Grade Async Pipeline:
+   Built with Python (FastAPI + SQLAlchemy + OpenCV + PyTesseract). Features non-blocking ingestion (HTTP 202 Accepted), offloading heavy CPU image analysis to background worker threads via asyncio.to_thread with built-in Exponential Backoff Retries (2s, 4s, 8s).
+
+2. 8 Multi-Modal Quality & Anomaly Heuristics:
+   - File Magic Byte Header Verification (FF D8 FF) against MIME spoofing
+   - Laplacian Blur Score Calculation (variance < 100.0)
+   - Multi-space Lighting & Contrast Analysis (HSV Luminance)
+   - 64-bit Perceptual Hash (dHash) Duplicate Photo Prevention
+   - Indian Motor Vehicle Registration OCR & Format Validation (MH12NW8556, TN05BT5754, MH12KR1145)
+   - Resolution & Aspect Ratio Validation
+   - EXIF Metadata & Screenshot Software Tampering Detection
+   - Automated Verdict Classification (PASS, WARNING, REJECT)
+
+3. Evaluated Against Official Field Dataset:
+   Verified live against the 3 official vehicle field sample photos (Pune & Chennai Auto-Rickshaws), returning 100% PASS verdicts with exact extracted license plates.
+
+4. Complete Test Suite & Enterprise UI:
+   Includes automated PyTest test suite (100% pass rate), Docker Compose setup, rate-limiting middleware, single-item deletion & bulk queue purge controls, interactive Web Dashboard UI, and an honest AI Usage Disclosure in README.md.
+
+Respectfully submitted,
+ANUVAMSHI BN
