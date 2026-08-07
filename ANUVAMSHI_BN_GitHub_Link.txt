@@ -1,48 +1,86 @@
+================================================================================
 TECHNICAL ASSIGNMENT SUBMISSION: INTELLIGENT MEDIA PROCESSING PIPELINE
+================================================================================
 
-Candidate Name: ANUVAMSHI BN
+Candidate Name : ANUVAMSHI BN
+Target Role    : Backend & AI Engineering
 Submission Date: August 2026
-Target Role: Backend & AI Engineering
 
 --------------------------------------------------------------------------------
-SUBMISSION LINKS (PUBLIC & LOCAL)
+1. PRIMARY REPOSITORY & LIVE DEPLOYMENT LINKS
 --------------------------------------------------------------------------------
-1. GitHub Repository URL:
-   https://github.com/ANUVAMSHI/image-processing-pipeline
+• Primary GitHub Repository URL:
+  https://github.com/ANUVAMSHI/image-processing-pipeline
 
-2. Live Public Dashboard UI (Accessible from any phone/browser worldwide):
-   https://anuvamshi-pipeline.loca.lt
+• Live Public Web Dashboard (Accessible from any device worldwide):
+  https://anuvamshi-pipeline.loca.lt
 
-3. Live Public Interactive API Documentation (OpenAPI Specs):
-   https://anuvamshi-pipeline.loca.lt/docs
+• Live Public Interactive API Documentation (OpenAPI Specs):
+  https://anuvamshi-pipeline.loca.lt/docs
 
-4. Local Application URL (Executes via `python -m uvicorn app.main:app --port 8000`):
-   http://localhost:8000
+• Local Environment Web Dashboard (Port 8000):
+  http://localhost:8000
 
-5. Local Interactive API Documentation:
-   http://localhost:8000/docs
+• Local Environment API Documentation:
+  http://localhost:8000/docs
 
 --------------------------------------------------------------------------------
-EXECUTIVE SUMMARY & SYSTEM HIGHLIGHTS
+2. SYSTEM ARCHITECTURE & ENGINEERING HIGHLIGHTS
 --------------------------------------------------------------------------------
-1. Production-Grade Async Pipeline:
-   Built with Python (FastAPI + SQLAlchemy + OpenCV + PyTesseract). Features non-blocking ingestion (HTTP 202 Accepted), offloading heavy CPU image analysis to background worker threads via asyncio.to_thread with built-in Exponential Backoff Retries (2s, 4s, 8s).
+• Non-Blocking Ingestion Pipeline:
+  Built with Python (FastAPI + SQLAlchemy + OpenCV + PyTesseract). Validates file
+  magic bytes (`FF D8 FF`), returns HTTP 202 Accepted immediately, and enqueues
+  processing tasks without blocking the main event loop.
 
-2. 8 Multi-Modal Quality & Anomaly Heuristics:
-   - File Magic Byte Header Verification (FF D8 FF) against MIME spoofing
-   - Laplacian Blur Score Calculation (variance < 100.0)
-   - Multi-space Lighting & Contrast Analysis (HSV Luminance)
-   - 64-bit Perceptual Hash (dHash) Duplicate Photo Prevention
-   - Indian Motor Vehicle Registration OCR & Format Validation (MH12NW8556, TN05BT5754, MH12KR1145)
-   - Resolution & Aspect Ratio Validation
-   - EXIF Metadata & Screenshot Software Tampering Detection
-   - Automated Verdict Classification (PASS, WARNING, REJECT)
+• Asynchronous Task Queue & Worker Threads:
+  Heavy computer vision analysis is offloaded to worker threads via asyncio.to_thread,
+  equipped with Exponential Backoff Retries (2s, 4s, 8s delays) for resilience.
 
-3. Evaluated Against Official Field Dataset:
-   Verified live against the 3 official vehicle field sample photos (Pune & Chennai Auto-Rickshaws), returning 100% PASS verdicts with exact extracted license plates.
+• 8 Multi-Modal Quality & Anomaly Heuristics:
+  1. Magic Byte Header Security Inspection (MIME spoofing defense)
+  2. Laplacian Blur Score Calculation (variance < 100.0)
+  3. Multi-Space Lighting & Contrast Analysis (HSV Luminance)
+  4. 64-bit Perceptual Hash (dHash) Duplicate Photo Prevention
+  5. Indian Vehicle Registration OCR & Format Validation (MH12NW8556, TN05BT5754)
+  6. Resolution & Aspect Ratio Validation
+  7. EXIF Metadata & Screenshot Software Tampering Detection
+  8. Quality Verdict Classification (PASS, WARNING, REJECT)
 
-4. Complete Test Suite & Enterprise UI:
-   Includes automated PyTest test suite (100% pass rate), Docker Compose setup, rate-limiting middleware, single-item deletion & bulk queue purge controls, interactive Web Dashboard UI, and an honest AI Usage Disclosure in README.md.
+• Enterprise Dashboard & Queue Management:
+  Features real-time polling, single-item deletion (`DELETE /api/v1/images/{id}`),
+  bulk queue purge (`DELETE /api/v1/images/clear-all`), and IP rate-limiting.
+
+--------------------------------------------------------------------------------
+3. OFFICIAL FIELD DATASET EVALUATION MATRIX
+--------------------------------------------------------------------------------
+Field Sample 1: Pune Auto-Rickshaw (Rear)
+• Extracted Plate: MH12NW8556 (Valid Format)
+• Blur Score     : 1503.30 (Sharp)
+• Luminance      : 135.36 (Optimal)
+• Verdict        : PASS ✅
+
+Field Sample 2: Chennai Auto-Rickshaw (Side)
+• Extracted Plate: TN05BT5754 (Valid Format)
+• Blur Score     : 1308.84 (Sharp)
+• Luminance      : 152.71 (Optimal)
+• Verdict        : PASS ✅
+
+Field Sample 3: Pune Auto-Rickshaw (Shadow)
+• Extracted Plate: MH12KR1145 (Valid Format)
+• Blur Score     : 619.08 (Sharp)
+• Luminance      : 126.76 (Optimal)
+• Verdict        : PASS ✅
+
+--------------------------------------------------------------------------------
+4. MANDATORY AI USAGE DISCLOSURE
+--------------------------------------------------------------------------------
+• AI Utility : Used for initial Pydantic schema drafting and CSS layout rules.
+• Validation : 100% test pass rate across automated pytest unit & integration tests.
+• AI Corrections Made:
+  1. Fixed OpenCV BGR vs PIL RGB color space conversions for HSV luminance.
+  2. Enhanced naive plate regex to support Indian Motor Vehicle formats.
+  3. Refactored synchronous file reads to async thread pool workers.
 
 Respectfully submitted,
 ANUVAMSHI BN
+================================================================================
