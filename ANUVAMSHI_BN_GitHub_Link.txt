@@ -1,89 +1,81 @@
-================================================================================
-          TECHNICAL ASSIGNMENT SUBMISSION REPORT
-          INTELLIGENT MEDIA PROCESSING & COMPUTER VISION PIPELINE
-================================================================================
+TECHNICAL ASSIGNMENT SUBMISSION REPORT
+INTELLIGENT MEDIA PROCESSING & COMPUTER VISION PIPELINE
 
 CANDIDATE INFORMATION
----------------------
-Candidate Name : ANUVAMSHI BN
+Candidate Name: ANUVAMSHI BN
 Target Position: Backend & AI Engineering
 Submission Date: August 2026
 
 PRIMARY REPOSITORY & LIVE DEPLOYMENT LINKS
-------------------------------------------
-• Primary GitHub Repository:
-  https://github.com/ANUVAMSHI/image-processing-pipeline
 
-• Live Public Web Dashboard (Worldwide Device Access):
-  https://anuvamshi-pipeline.loca.lt
+Primary GitHub Repository:
+https://github.com/ANUVAMSHI/image-processing-pipeline
 
-• Live Public Interactive API Documentation (OpenAPI Specs):
-  https://anuvamshi-pipeline.loca.lt/docs
+Live Public Web Dashboard (Worldwide Access):
+https://anuvamshi-pipeline.loca.lt
 
-• Local Environment Web Dashboard (Port 8000):
-  http://localhost:8000
+Live Public Interactive API Documentation (OpenAPI Specs):
+https://anuvamshi-pipeline.loca.lt/docs
 
-• Local Environment API Documentation:
-  http://localhost:8000/docs
+Local Environment Web Dashboard (Port 8000):
+http://localhost:8000
+
+Local Environment API Documentation:
+http://localhost:8000/docs
 
 
 EXECUTIVE SUMMARY & SYSTEM HIGHLIGHTS
--------------------------------------
+
 1. Non-Blocking Ingestion Pipeline:
-   Built with Python (FastAPI + SQLAlchemy + OpenCV + PyTesseract). Validates file
-   magic bytes (FF D8 FF), returns HTTP 202 Accepted immediately, and enqueues
-   processing tasks without blocking the main event loop.
+   Built with Python (FastAPI + SQLAlchemy + OpenCV + PyTesseract). Validates file magic bytes (FF D8 FF), returns HTTP 202 Accepted immediately, and enqueues processing tasks without blocking the main event loop.
 
 2. Asynchronous Task Queue & Worker Threads:
-   Heavy computer vision analysis is offloaded to background worker threads via
-   asyncio.to_thread, equipped with Exponential Backoff Retries (2s, 4s, 8s) for
-   maximum fault resilience.
+   Heavy computer vision analysis is offloaded to background worker threads via asyncio.to_thread, equipped with Exponential Backoff Retries (2s, 4s, 8s) for maximum fault resilience.
 
 3. 8 Multi-Modal Quality & Anomaly Heuristics:
-   - Magic Byte Header Security Inspection (MIME-type spoofing defense)
-   - Laplacian Blur Score Calculation (variance < 100.0)
-   - Multi-Space Lighting & Contrast Analysis (HSV Luminance)
-   - 64-bit Perceptual Hash (dHash) Duplicate Photo Prevention
-   - Indian Vehicle Registration OCR & Format Validation (MH12NW8556, TN05BT5754)
-   - Resolution & Aspect Ratio Validation
-   - EXIF Metadata & Screenshot Software Tampering Detection
-   - Automated Verdict Classification (PASS, WARNING, REJECT)
+   * Magic Byte Header Security Inspection (MIME-type spoofing defense)
+   * Laplacian Blur Score Calculation (variance < 100.0)
+   * Multi-Space Lighting & Contrast Analysis (HSV Luminance)
+   * 64-bit Perceptual Hash (dHash) Duplicate Photo Prevention
+   * Indian Vehicle Registration OCR & Format Validation (MH12NW8556, TN05BT5754, MH12KR1145)
+   * Resolution & Aspect Ratio Validation
+   * EXIF Metadata & Screenshot Software Tampering Detection
+   * Automated Verdict Classification (PASS, WARNING, REJECT)
 
 4. Enterprise Dashboard & Queue Controls:
-   Features real-time queue status polling, single-item deletion (DELETE /api/v1/images/{id}),
-   bulk queue purge (DELETE /api/v1/images/clear-all), and IP-based rate limiting.
+   Features real-time queue status polling, single-item deletion (DELETE /api/v1/images/{id}), bulk queue purge (DELETE /api/v1/images/clear-all), and IP-based rate limiting.
 
 
 OFFICIAL FIELD DATASET EVALUATION MATRIX
-----------------------------------------
+
 Field Sample 1: Pune Auto-Rickshaw (Rear)
-• Extracted Plate: MH12NW8556 (Valid Registration Format)
-• Sharpness Score: 1503.30 (Sharp)
-• Luminance      : 135.36 (Optimal Lighting)
-• Final Verdict  : PASS
+* Extracted Registration Plate: MH12NW8556 (Valid Format)
+* Sharpness Score (Laplacian): 1503.30 (Sharp)
+* Luminance (HSV Mean)        : 135.36 (Optimal)
+* Final Quality Verdict        : PASS
 
 Field Sample 2: Chennai Auto-Rickshaw (Side)
-• Extracted Plate: TN05BT5754 (Valid Registration Format)
-• Sharpness Score: 1308.84 (Sharp)
-• Luminance      : 152.71 (Optimal Lighting)
-• Final Verdict  : PASS
+* Extracted Registration Plate: TN05BT5754 (Valid Format)
+* Sharpness Score (Laplacian): 1308.84 (Sharp)
+* Luminance (HSV Mean)        : 152.71 (Optimal)
+* Final Quality Verdict        : PASS
 
 Field Sample 3: Pune Auto-Rickshaw (Shadow)
-• Extracted Plate: MH12KR1145 (Valid Registration Format)
-• Sharpness Score: 619.08 (Sharp)
-• Luminance      : 126.76 (Optimal Lighting)
-• Final Verdict  : PASS
+* Extracted Registration Plate: MH12KR1145 (Valid Format)
+* Sharpness Score (Laplacian): 619.08 (Sharp)
+* Luminance (HSV Mean)        : 126.76 (Optimal)
+* Final Quality Verdict        : PASS
 
 
 MANDATORY AI USAGE DISCLOSURE & ENGINEERING VALIDATION
-------------------------------------------------------
-• AI Utility : Utilized for initial Pydantic schema generation and CSS layout rules.
-• Validation : 100% test pass rate across automated pytest unit and integration suites.
-• AI Corrections Implemented:
+
+* AI Utility: Utilized for initial Pydantic schema generation and CSS layout rules.
+* Validation: 100% test pass rate across automated pytest unit and integration suites.
+* AI Corrections Implemented:
   1. Fixed OpenCV BGR vs PIL RGB color space conversions for HSV luminance.
   2. Formulated robust regex for standard Indian motor vehicle formats and Bharat (BH) series.
   3. Refactored synchronous file IO inside async request handlers to thread pool workers.
 
+
 Respectfully submitted,
 ANUVAMSHI BN
-================================================================================
